@@ -16,15 +16,12 @@ type HandshakeRequest struct {
 
 const HandshakeOpcode = 6
 
-const (
-	HandshakeRequestCmd = 0
-	HandshakeRequestSeq = 0
-)
+const HandshakeRequestSeq = 0
 
 func (pk *HandshakeRequest) MarshalPacket() ([]byte, error) {
 	return json.Marshal(packet{
 		Ver:     Version,
-		Cmd:     HandshakeRequestCmd,
+		Cmd:     requestCmd,
 		Seq:     HandshakeRequestSeq,
 		Opcode:  HandshakeOpcode,
 		Payload: pk,

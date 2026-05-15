@@ -10,16 +10,13 @@ type ChatsGetRequest struct {
 
 const ChatsGetOpcode = 48
 
-const (
-	ChatsGetRequestCmd = 0
-	ChatsGetRequestSeq = 2
-)
+const ChatsGetRequestSeq = 2
 
 func (pk *ChatsGetRequest) MarshalPacket() ([]byte, error) {
 	return json.Marshal(packet{
 		Ver:     Version,
-		Cmd:     ChatsGetRequestCmd,
-		Seq:     ChatsGetRequestSeq,
+		Cmd:     requestCmd,
+		Seq:     ChatsGetRequestSeq, //todo: automate sequence count
 		Opcode:  ChatsGetOpcode,
 		Payload: pk,
 	})

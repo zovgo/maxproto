@@ -12,6 +12,8 @@ type Packet interface {
 
 const Version = 11
 
+const requestCmd = 0
+
 type packet struct {
 	Ver     int `json:"ver"`
 	Cmd     int `json:"cmd"`
