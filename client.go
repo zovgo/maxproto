@@ -91,7 +91,7 @@ func (c *Client) keepAlive(seq func() int) {
 	}
 }
 
-func (c *Client) WaitForMessages(handler func(protocol.Message)) error {
+func (c *Client) WaitForMessages(handler func(*packet.ReceiveMessage)) error {
 	c.wg.Add(1)
 	defer c.wg.Done()
 
@@ -111,7 +111,7 @@ func (c *Client) WaitForMessages(handler func(protocol.Message)) error {
 		if pk.Opcode() != packet.ReceiveMessageOpcode {
 			continue
 		}
-		handler(*pk.(*packet.ReceiveMessage).Message)
+		handler(pk.(*packet.ReceiveMessage))
 	}
 }
 
