@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/google/uuid"
@@ -26,7 +27,7 @@ func main() {
 		ChatCount: 40,
 	}
 	fmt.Println("dialing...")
-	client, err := conf.DialContext(ctx, true)
+	client, err := conf.DialContext(ctx, false)
 	if err != nil {
 		panic(fmt.Errorf("dial: %w", err))
 	}
@@ -57,33 +58,14 @@ func handleMessage(cl *maxproto.Client) func(protocol.Message) {
 			return
 		}
 		printName(c)
+
+		ok = true
 		for _, a := range message.Attaches {
-			switch a.Type {
-			case "STICKER":
-				fmt.Println("(sticker)")
-				return
-			case "PHOTO":
-				fmt.Println("(photo)")
-				return
-			case "VIDEO":
-				fmt.Println("(video)")
-				return
-			case "AUDIO":
-				fmt.Println("(audio)")
-				return
-			case "FILE":
-				fmt.Println("(file)")
-				return
-			case "POLL":
-				fmt.Println("(poll)")
-				return
-			case "LOCATION":
-				fmt.Println("(location)")
-				return
-			case "CONTACT":
-				fmt.Println("(contact)")
-				return
-			}
+			ok = false
+			fmt.Printf("(%s)", strings.ToLower(a.Type))
+		}
+		if !ok {
+			return
 		}
 		fmt.Println(message.Text)
 	}
