@@ -2,6 +2,9 @@ package packet
 
 import "github.com/zovgo/maxproto/protocol"
 
+// fixme: client sends this ? why
+//  {"ver":11,"cmd":1,"seq":22,"opcode":128,"payload":{"chatId":-7777,"messageId":"1111"}}
+
 type ReceiveMessage struct {
 	onlyResponse
 

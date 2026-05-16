@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/zovgo/maxproto/internal"
 	"github.com/zovgo/maxproto/packet"
 	"github.com/zovgo/maxproto/protocol"
 )
@@ -25,10 +26,11 @@ type Client struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	contacts map[int64]protocol.Contact
-	chats    map[int64]protocol.Chat
-	profile  *protocol.Profile
-
+	data internal.ValueWithMutex[struct {
+		contacts map[int64]protocol.Contact
+		chats    map[int64]protocol.Chat
+		profile  *protocol.Profile
+	}]
 	seq atomic.Int64
 
 	wg sync.WaitGroup
@@ -118,11 +120,57 @@ func (c *Client) WaitForMessages(handler func(*packet.ReceiveMessage)) error {
 			}
 			return err
 		}
-		if pk.Opcode() != packet.ReceiveMessageOpcode {
-			continue
+		switch pk := pk.(type) {
+		case *packet.ReceiveMessage:
+			c.handleMessage(handler, pk)
+		case *packet.ProfileChange:
+			c.handleProfileChange(pk)
+		case *packet.ContactChange:
+			c.handleContactChange(pk)
 		}
-		handler(pk.(*packet.ReceiveMessage))
 	}
+}
+
+func (c *Client) handleContactChange(pk *packet.ContactChange) {
+	c.data.Lock()
+	defer c.data.Unlock()
+
+	if _, ok := c.data.V.contacts[pk.Contact.ID]; !ok {
+		c.data.V.contacts[pk.Contact.ID] = pk.Contact
+		return
+	}
+	c.data.V.contacts[pk.Contact.ID] = pk.Contact
+}
+
+func (c *Client) handleProfileChange(pk *packet.ProfileChange) {
+	c.data.Lock()
+	defer c.data.Unlock()
+
+	if pk.Profile.Contact.ID != c.data.V.profile.Contact.ID {
+		return
+	}
+	*c.data.V.profile = pk.Profile
+}
+
+func (c *Client) handleMessage(h func(*packet.ReceiveMessage), pk *packet.ReceiveMessage) {
+	defer h(pk)
+
+	if len(pk.Message.Attaches) == 0 {
+		return
+	}
+	a := pk.Message.Attaches[0]
+	if a.Type != "CONTROL" || a.Event != "title" {
+		return
+	}
+	c.data.Lock()
+	defer c.data.Unlock()
+
+	ch, ok := c.data.V.chats[pk.ChatID]
+	if !ok {
+		return
+	}
+	ch.Title = a.Title
+	c.data.V.chats[pk.ChatID] = ch
 }
 
 func (c *Client) setContextualDeadline(write bool) {
@@ -172,17 +220,23 @@ func (c *Client) Closed() bool {
 }
 
 func (c *Client) Contact(id int64) (protocol.Contact, bool) {
-	if c.profile.Contact.ID == id {
+	c.data.Lock()
+	defer c.data.Unlock()
+
+	if p := c.data.V.profile; p.Contact.ID == id {
 		// self
-		return c.profile.Contact, true
+		return p.Contact, true
 	}
-	co, ok := c.contacts[id]
+	co, ok := c.data.V.contacts[id]
 	return co, ok
 }
 
 func (c *Client) Contacts() iter.Seq[protocol.Contact] {
 	return func(yield func(protocol.Contact) bool) {
-		for _, co := range c.contacts {
+		c.data.Lock()
+		defer c.data.Unlock()
+
+		for _, co := range c.data.V.contacts {
 			if !yield(co) {
 				return
 			}
@@ -191,13 +245,19 @@ func (c *Client) Contacts() iter.Seq[protocol.Contact] {
 }
 
 func (c *Client) Chat(id int64) (protocol.Chat, bool) {
-	ch, ok := c.chats[id]
+	c.data.Lock()
+	defer c.data.Unlock()
+
+	ch, ok := c.data.V.chats[id]
 	return ch, ok
 }
 
 func (c *Client) Chats() iter.Seq[protocol.Chat] {
 	return func(yield func(protocol.Chat) bool) {
-		for _, ch := range c.chats {
+		c.data.Lock()
+		defer c.data.Unlock()
+
+		for _, ch := range c.data.V.chats {
 			if !yield(ch) {
 				return
 			}
@@ -206,5 +266,7 @@ func (c *Client) Chats() iter.Seq[protocol.Chat] {
 }
 
 func (c *Client) Profile() protocol.Profile {
-	return *c.profile
+	c.data.Lock()
+	defer c.data.Unlock()
+	return *c.data.V.profile
 }

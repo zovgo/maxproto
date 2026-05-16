@@ -17,6 +17,8 @@ func init() {
 	register(newEntry(func() Packet { return new(ReceiveMessage) }))
 	register(newEntry(func() Packet { return new(KeepAliveResponse) }, unmarshalKeepAliveResp))
 	register(newEntry(func() Packet { return new(MessageSendResponse) }))
+	register(newEntry(func() Packet { return new(ProfileChange) }))
+	register(newEntry(func() Packet { return new(ContactChange) }))
 }
 
 type packetEntry struct {

@@ -58,4 +58,5 @@ type Attach struct {
 	UserIDs             []int     `json:"userIds,omitempty"`
 	PinnedMessage       *Message  `json:"pinnedMessage,omitempty"`
 	TranscriptionStatus string    `json:"transcriptionStatus,omitempty"`
+	Title               string    `json:"title,omitempty"`
 }

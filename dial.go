@@ -163,15 +163,15 @@ func chatsGetRequest(cl *Client) error {
 }
 
 func initSession(cl *Client, pk *packet.LoginResponse) {
-	cl.contacts = make(map[int64]protocol.Contact) //TODO: max also sends packet if chat,profile,contact changes
+	cl.data.V.contacts = make(map[int64]protocol.Contact) //TODO: max also sends packet if chat,profile,contact changes
 	for _, c := range pk.Contacts {
-		cl.contacts[c.ID] = c
+		cl.data.V.contacts[c.ID] = c
 	}
-	cl.chats = make(map[int64]protocol.Chat)
+	cl.data.V.chats = make(map[int64]protocol.Chat)
 	for _, c := range pk.Chats {
-		cl.chats[c.ID] = c
+		cl.data.V.chats[c.ID] = c
 	}
-	cl.profile = &pk.Profile
+	cl.data.V.profile = &pk.Profile
 }
 
 func fillConf(conf *DialConfig) error {
