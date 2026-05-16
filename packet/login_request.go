@@ -15,13 +15,11 @@ type LoginRequest struct {
 
 const LoginOpcode = 19
 
-const LoginRequestSeq = 1
-
-func (pk *LoginRequest) MarshalPacket() ([]byte, error) {
+func (pk *LoginRequest) MarshalPacket(seq int) ([]byte, error) {
 	return json.Marshal(packet{
 		Ver:     Version,
 		Cmd:     requestCmd,
-		Seq:     LoginRequestSeq,
+		Seq:     seq,
 		Opcode:  LoginOpcode,
 		Payload: pk,
 	})

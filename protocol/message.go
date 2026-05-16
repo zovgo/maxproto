@@ -8,7 +8,7 @@ type Message struct {
 	Type       string           `json:"type"`
 	Attaches   []Attach         `json:"attaches"`
 	Options    int              `json:"options,omitempty"`
-	Cid        int64            `json:"cid,omitempty"`
+	CID        int64            `json:"cid,omitempty"`
 	Link       *Link            `json:"link,omitempty"`
 	Elements   []MessageElement `json:"elements,omitempty"`
 	UpdateTime int64            `json:"updateTime,omitempty"`
@@ -30,32 +30,32 @@ type Attach struct {
 	Type                string    `json:"_type"`
 	Event               string    `json:"event,omitempty"`
 	PreviewData         string    `json:"previewData,omitempty"`
-	BaseUrl             string    `json:"baseUrl,omitempty"`
+	BaseURL             string    `json:"baseUrl,omitempty"`
 	PhotoToken          string    `json:"photoToken,omitempty"`
 	Width               int       `json:"width,omitempty"`
-	PhotoId             int64     `json:"photoId,omitempty"`
 	Height              int       `json:"height,omitempty"`
+	PhotoID             int64     `json:"photoId,omitempty"`
 	Duration            int       `json:"duration,omitempty"`
-	AudioId             int64     `json:"audioId,omitempty"`
+	AudioID             int64     `json:"audioId,omitempty"`
 	Wave                string    `json:"wave,omitempty"`
-	Url                 string    `json:"url,omitempty"`
+	URL                 string    `json:"url,omitempty"`
 	Token               string    `json:"token,omitempty"`
-	ConversationId      string    `json:"conversationId,omitempty"`
+	ConversationID      string    `json:"conversationId,omitempty"`
 	HangupType          string    `json:"hangupType,omitempty"`
 	CallType            string    `json:"callType,omitempty"`
-	ContactIds          []int     `json:"contactIds,omitempty"`
+	ContactIDs          []int     `json:"contactIds,omitempty"`
 	Keyboard            *Keyboard `json:"keyboard,omitempty"`
-	CallbackId          string    `json:"callbackId,omitempty"`
+	CallbackID          string    `json:"callbackId,omitempty"`
 	JoinLink            string    `json:"joinLink,omitempty"`
 	AuthorType          string    `json:"authorType,omitempty"`
-	LottieUrl           string    `json:"lottieUrl,omitempty"`
-	StickerId           int       `json:"stickerId,omitempty"`
+	LottieURL           string    `json:"lottieUrl,omitempty"`
+	StickerID           int       `json:"stickerId,omitempty"`
 	Tags                []string  `json:"tags,omitempty"`
-	SetId               int       `json:"setId,omitempty"`
-	Time                int64     `json:"time,omitempty"`
+	SetID               int       `json:"setId,omitempty"`
+	Time                Timestamp `json:"time,omitempty"`
 	StickerType         string    `json:"stickerType,omitempty"`
 	Audio               bool      `json:"audio,omitempty"`
-	UserIds             []int     `json:"userIds,omitempty"`
+	UserIDs             []int     `json:"userIds,omitempty"`
 	PinnedMessage       *Message  `json:"pinnedMessage,omitempty"`
 	TranscriptionStatus string    `json:"transcriptionStatus,omitempty"`
 }

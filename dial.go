@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"sync/atomic"
 	"time"
 
 	"github.com/google/uuid"
@@ -82,12 +81,7 @@ func dial(parent context.Context, parentTemp bool, conf DialConfig) (*Client, er
 		case <-ctx.Done():
 		}
 	})
-	var seq atomic.Int64
-	cl.wg.Go(func() {
-		cl.keepAlive(func() int {
-			return int(seq.Add(1))
-		})
-	})
+	cl.wg.Go(cl.keepAlive)
 	return cl, nil
 }
 

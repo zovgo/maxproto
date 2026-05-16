@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"iter"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -28,6 +29,8 @@ type Client struct {
 	chats    map[int64]protocol.Chat
 	profile  *protocol.Profile
 
+	seq atomic.Int64
+
 	wg sync.WaitGroup
 }
 
@@ -47,7 +50,7 @@ func (c *Client) WritePacket(pk packet.Packet) error {
 	if c.Closed() {
 		return ErrClientClosed
 	}
-	data, err := pk.MarshalPacket()
+	data, err := pk.MarshalPacket(int(c.seq.Add(1)))
 	if err != nil {
 		return fmt.Errorf("marshal json: %w", err)
 	}
@@ -75,7 +78,7 @@ func (c *Client) ReadPacket() (packet.Packet, error) {
 	return pk, nil
 }
 
-func (c *Client) keepAlive(seq func() int) {
+func (c *Client) keepAlive() {
 	ticker := time.NewTicker(pingPeriod)
 	defer ticker.Stop()
 
@@ -84,7 +87,7 @@ func (c *Client) keepAlive(seq func() int) {
 		case <-c.ctx.Done():
 			return
 		case <-ticker.C:
-			if err := c.WritePacket(&packet.KeepAliveRequest{Seq: seq()}); err != nil {
+			if err := c.WritePacket(&packet.KeepAliveRequest{}); err != nil {
 				//fixme: log
 				return
 			}

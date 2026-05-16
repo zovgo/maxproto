@@ -6,6 +6,6 @@ var ErrPacketDoesntSupportMarshalling = errors.New("packet does not support mars
 
 type onlyResponse struct{}
 
-func (*onlyResponse) MarshalPacket() ([]byte, error) {
+func (*onlyResponse) MarshalPacket(int) ([]byte, error) {
 	return nil, ErrPacketDoesntSupportMarshalling
 }
