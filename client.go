@@ -201,3 +201,7 @@ func (c *Client) Chats() iter.Seq[protocol.Chat] {
 		}
 	}
 }
+
+func (c *Client) Profile() protocol.Profile {
+	return *c.profile
+}
