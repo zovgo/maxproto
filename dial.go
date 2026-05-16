@@ -143,13 +143,7 @@ func loginRequest(cl *Client, conf DialConfig) error {
 	if pk.Opcode() != packet.LoginOpcode {
 		return fmt.Errorf("unexpected opcode: %v", pk.Opcode())
 	}
-	p := pk.(*packet.LoginResponse)
-
-	cl.contacts = make(map[int64]protocol.Contact)
-	for _, c := range p.Contacts {
-		cl.contacts[c.ID] = c
-	}
-	cl.profile = &p.Profile
+	initSession(cl, pk.(*packet.LoginResponse))
 	return nil
 }
 
@@ -172,6 +166,18 @@ func chatsGetRequest(cl *Client) error {
 		return fmt.Errorf("read resp: %w", err)
 	}
 	return nil
+}
+
+func initSession(cl *Client, pk *packet.LoginResponse) {
+	cl.contacts = make(map[int64]protocol.Contact)
+	for _, c := range pk.Contacts {
+		cl.contacts[c.ID] = c
+	}
+	cl.chats = make(map[int64]protocol.Chat)
+	for _, c := range pk.Chats {
+		cl.chats[c.ID] = c
+	}
+	cl.profile = &pk.Profile
 }
 
 func fillConf(conf *DialConfig) error {

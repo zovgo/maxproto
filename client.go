@@ -25,6 +25,7 @@ type Client struct {
 	cancel context.CancelFunc
 
 	contacts map[int64]protocol.Contact
+	chats    map[int64]protocol.Chat
 	profile  *protocol.Profile
 
 	wg sync.WaitGroup
@@ -167,7 +168,7 @@ func (c *Client) Closed() bool {
 	return false
 }
 
-func (c *Client) GetContact(id int64) (protocol.Contact, bool) {
+func (c *Client) Contact(id int64) (protocol.Contact, bool) {
 	if c.profile.Contact.ID == id {
 		// self
 		return c.profile.Contact, true
@@ -180,6 +181,21 @@ func (c *Client) Contacts() iter.Seq[protocol.Contact] {
 	return func(yield func(protocol.Contact) bool) {
 		for _, co := range c.contacts {
 			if !yield(co) {
+				return
+			}
+		}
+	}
+}
+
+func (c *Client) Chat(id int64) (protocol.Chat, bool) {
+	ch, ok := c.chats[id]
+	return ch, ok
+}
+
+func (c *Client) Chats() iter.Seq[protocol.Chat] {
+	return func(yield func(protocol.Chat) bool) {
+		for _, ch := range c.chats {
+			if !yield(ch) {
 				return
 			}
 		}
