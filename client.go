@@ -98,6 +98,9 @@ func (c *Client) WaitForMessages(handler func(*packet.ReceiveMessage)) error {
 	for {
 		select {
 		case <-c.ctx.Done():
+			if errors.Is(c.ctx.Err(), context.Canceled) {
+				return nil
+			}
 			return c.ctx.Err()
 		default:
 		}
@@ -105,6 +108,9 @@ func (c *Client) WaitForMessages(handler func(*packet.ReceiveMessage)) error {
 		if err != nil {
 			if errors.Is(err, packet.ErrUnhandledOpcode) {
 				continue
+			}
+			if errors.Is(err, ErrClientClosed) {
+				return nil
 			}
 			return err
 		}
