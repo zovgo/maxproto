@@ -169,7 +169,7 @@ func chatsGetRequest(cl *Client) error {
 }
 
 func initSession(cl *Client, pk *packet.LoginResponse) {
-	cl.contacts = make(map[int64]protocol.Contact)
+	cl.contacts = make(map[int64]protocol.Contact) //TODO: max also sends packet if chat,profile,contact changes
 	for _, c := range pk.Contacts {
 		cl.contacts[c.ID] = c
 	}
