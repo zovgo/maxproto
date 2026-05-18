@@ -10,19 +10,21 @@ type Config struct {
 	Experiments ConfigExperiments    `json:"experiments"`
 }
 
+// cannot unmarshal object into Go struct field ConfigExperiments.config.experiments.calls-android-wtp of type string
+
 type ConfigExperiments struct {
-	CallsAndroidWtp            string `json:"calls-android-wtp"`
-	KeepBackgroundSocket       string `json:"keep-background-socket"`
-	MediaTransform             string `json:"media-transform"`
-	CallsCheckAuState          bool   `json:"calls-check-au-state"`
-	SkipStatusFirstAudioUpload bool   `json:"skip-status-first-audio-upload"`
-	CallsAndroidH265S          int    `json:"calls-android-h265-s"`
-	CallsSdkIosFastJoin        int    `json:"calls-sdk-ios-fast-join"`
-	AppAbTestExp               bool   `json:"app.ab.test.exp"`
-	CallsAndroidEarlySetOffer  bool   `json:"calls-android-early-set-offer"`
-	CallsSdkH265Prioritized    bool   `json:"calls-sdk-h265-prioritized"`
-	CallsSdkIceSize            int    `json:"calls-sdk-ice-size"`
-	CallsSdkWtDns              int    `json:"calls-sdk-wt-dns"`
+	CallsAndroidWtp            json.RawMessage `json:"calls-android-wtp"` //fixme
+	KeepBackgroundSocket       string          `json:"keep-background-socket"`
+	MediaTransform             string          `json:"media-transform"`
+	CallsCheckAuState          bool            `json:"calls-check-au-state"`
+	SkipStatusFirstAudioUpload bool            `json:"skip-status-first-audio-upload"`
+	CallsAndroidH265S          int             `json:"calls-android-h265-s"`
+	CallsSdkIosFastJoin        int             `json:"calls-sdk-ios-fast-join"`
+	AppAbTestExp               bool            `json:"app.ab.test.exp"`
+	CallsAndroidEarlySetOffer  bool            `json:"calls-android-early-set-offer"`
+	CallsSdkH265Prioritized    bool            `json:"calls-sdk-h265-prioritized"`
+	CallsSdkIceSize            int             `json:"calls-sdk-ice-size"`
+	CallsSdkWtDns              int             `json:"calls-sdk-wt-dns"`
 }
 
 type ConfigUser struct {
